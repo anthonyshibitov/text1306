@@ -10,6 +10,7 @@ class TextDisplay {
         void init();
         void inverted(bool);
         void write(int, char*);
+        void print(char *);
         void clearLine(int);
         void clearAll();
     private:
