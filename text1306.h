@@ -8,15 +8,12 @@ class TextDisplay {
     public:
         TextDisplay();
         void init();
-        void inverted(bool);
-        void write(int, char*);
-        void print(char *);
-        void clearLine(int);
+        void inverted(bool invert);
+        void write(int line, char * buffer);
+        void clearLine(int line);
         void clearAll();
     private:
         void _writeChar(int, int, char);
-        int _linePos;
-        int _colPos;
 };
 
 #endif

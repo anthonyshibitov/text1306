@@ -42,31 +42,9 @@ void TextDisplay::inverted(bool invert){
 
 void TextDisplay::write(int line, char * buffer){
     char size = strlen(buffer);
-    for(int i = 0; i < size; i++){
+    for(int i = 0; i < size && i <= 21; i++){
         _writeChar(line, i, buffer[i]);
     }
-}
-
-void TextDisplay::print(char * buffer){
-    int poz = 0;
-    for(int currentPage = 0; currentPage < 8; currentPage++){
-    Wire.beginTransmission(0x3C);
-    Wire.write(0x00);
-    Wire.write(0x00);
-    Wire.write(0x10);
-    int x = 0xB0 + currentPage;
-    Wire.write(x);
-    Wire.endTransmission();
-    for(int col = 0; col < 128; col++){
-      Wire.beginTransmission(0x3C);
-      Wire.write(0xC0);
-      if(poz < 1024){
-        Wire.write(buffer[poz]);
-        poz++;
-      }
-      Wire.endTransmission();
-    }
-  }
 }
 
 void TextDisplay::clearLine(int line){
