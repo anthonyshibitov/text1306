@@ -1,6 +1,8 @@
 /*
 
-    Font is 6x8
+  text1306
+
+  anthony shibitov
 
 */
 
@@ -21,9 +23,6 @@ void TextDisplay::init(){
     Wire.write(0x02);
     Wire.write(0xA0);
     Wire.endTransmission();
-
-    _linePos = 7;
-    _colPos = 0;
 }
 
 void TextDisplay::inverted(bool invert){
@@ -41,6 +40,8 @@ void TextDisplay::inverted(bool invert){
 }
 
 void TextDisplay::write(int line, char * buffer){
+    if(line < 0 || line > 7)
+      return;
     char size = strlen(buffer);
     for(int i = 0; i < size && i <= 21; i++){
         _writeChar(line, i, buffer[i]);
