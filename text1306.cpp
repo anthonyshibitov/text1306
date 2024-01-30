@@ -57,29 +57,22 @@ void TextDisplay::clearLine(int line){
     Wire.write(x);
     Wire.endTransmission();
 
-    for(int col = 0; col < 140; col++){
+    /* There's sometimes dead space on the righthand side. From corruption that
+       is outside of the regular writing bounds, hence 9 loops for 128px wide */
+    for(int outer = 0; outer < 9; outer++){
       Wire.beginTransmission(0x3C);
-      Wire.write(0xC0);
-      Wire.write(0x00);
+      Wire.write(0x40);
+      /* Needs to be done in 16 byte bursts. I2C max buffer size is typically 32bytes for Wire.h */
+      for(int col = 0; col < 16; col++){
+        Wire.write(0x00);
+      }
       Wire.endTransmission();
     }
 }
 
 void TextDisplay::clearAll(){
   for(int currentPage = 0; currentPage < 8; currentPage++){
-    Wire.beginTransmission(0x3C);
-    Wire.write(0x00);
-    Wire.write(0x00);
-    Wire.write(0x10);
-    int x = 0xB0 + currentPage;
-    Wire.write(x);
-    Wire.endTransmission();
-    for(int col = 0; col < 140; col++){
-      Wire.beginTransmission(0x3C);
-      Wire.write(0xC0);
-      Wire.write(0x00);
-      Wire.endTransmission();
-    }
+    clearLine(currentPage);
   }
 }
 
@@ -103,10 +96,11 @@ void TextDisplay::_writeChar(int line, int col, char buffer){
     Wire.write(page);
     Wire.endTransmission();
 
+    Wire.beginTransmission(0x3C);
+    Wire.write(0x40);
     for(int i = 0; i < 6; i++){
-        Wire.beginTransmission(0x3C);
-        Wire.write(0xC0);
         Wire.write(fontBuffer[i]);
-        Wire.endTransmission();
     }
+    Wire.endTransmission();
+
 }
