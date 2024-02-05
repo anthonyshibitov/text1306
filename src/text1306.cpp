@@ -10,7 +10,6 @@
 #include "font.h"
 
 TextDisplay::TextDisplay(){
-    
 }
 
 void TextDisplay::init(){
@@ -21,7 +20,8 @@ void TextDisplay::init(){
     Wire.write(0xAF);
     Wire.write(0x20);
     Wire.write(0x02);
-    Wire.write(0xA0);
+    Wire.write(0xA0); //Segment remap disabled
+    _flipped = false;
     Wire.endTransmission();
 }
 
@@ -43,8 +43,14 @@ void TextDisplay::write(int line, char * buffer){
     if(line < 0 || line > 7)
       return;
     char size = strlen(buffer);
-    for(int i = 0; i < size && i <= 21; i++){
+    if(_flipped == false){
+      for(int i = 0; i < size && i <= 21; i++){
         _writeChar(line, i, buffer[i]);
+      }
+    } else {
+      for(int i = 0; i < size && i <= 21; i++){
+        _writeChar(line, i, buffer[i]);
+      }
     }
 }
 
@@ -53,6 +59,9 @@ void TextDisplay::clearLine(int line){
     Wire.write(0x00);
     Wire.write(0x00);
     Wire.write(0x10);
+    if(_flipped){
+      line = 7 - line;
+    }
     int x = 0xB0 + line;
     Wire.write(x);
     Wire.endTransmission();
@@ -79,7 +88,11 @@ void TextDisplay::clearAll(){
 void TextDisplay::_writeChar(int line, int col, char buffer){
     char fontBuffer[6];
     for(int i = 0; i < 6; i++){
-        fontBuffer[i] = font[buffer][i];
+        if(_flipped){
+          fontBuffer[i] = reverse(font[buffer][i]);
+        } else {
+          fontBuffer[i] = font[buffer][i];
+        }
     }
 
     col = col * 6;
@@ -87,6 +100,9 @@ void TextDisplay::_writeChar(int line, int col, char buffer){
     col++;
     char columnLowerNibble = col & 0x0F;
     char columnHigherNibble = ((col & 0xF0) >> 4) + 0x10;
+    if(_flipped){
+      line = 7 - line;
+    }
     int page = line + 0xB0;
 
     Wire.beginTransmission(0x3C);
@@ -103,4 +119,29 @@ void TextDisplay::_writeChar(int line, int col, char buffer){
     }
     Wire.endTransmission();
 
+}
+
+void TextDisplay::flipDisplay(bool flip){
+  if(flip == false){
+    Wire.beginTransmission(0x3C);
+    Wire.write(0x00);
+    Wire.write(0xA0);
+    Wire.endTransmission();  
+    _flipped = false;
+  }
+  else {
+    Wire.beginTransmission(0x3C);
+    Wire.write(0x00);
+    Wire.write(0xA1);
+    Wire.endTransmission();
+    _flipped = true;
+  }
+}
+
+/* Credit: https://stackoverflow.com/a/2602885 */
+unsigned char TextDisplay::reverse(unsigned char b) {
+   b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+   b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+   b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+   return b;
 }

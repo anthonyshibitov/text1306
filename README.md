@@ -23,7 +23,10 @@ text1306 is a small and straight-forward library to display text on displays dri
 `clearAll()`
 > Clear all lines of text, effectively resetting the display.
 
+`flipDisplay(bool flip)`  
+> Flip the display.
+
 ## To do
 &#9744; Reduce font library size by removing empty characters.  
-&#9744; Submit to Arduino Library repo for easier install.  
+&#9745; Submit to Arduino Library repo for easier install.  
 &#9744; Support 128x32 displays.

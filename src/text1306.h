@@ -12,8 +12,11 @@ class TextDisplay {
         void write(int line, char * buffer);
         void clearLine(int line);
         void clearAll();
+        void flipDisplay(bool);
+        unsigned char reverse(unsigned char);
     private:
         void _writeChar(int, int, char);
+        bool _flipped;
 };
 
 #endif
